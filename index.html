@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YouTube Content AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 30px;
+      width: 100%;
+      max-width: 650px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: #ff0000;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+      color: #ddd;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 12px 16px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    input:focus,
+    select:focus {
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+    }
+
+    button {
+      background: #ff0000;
+      color: white;
+      border: none;
+      padding: 14px;
+      margin-top: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      width: 100%;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #cc0000;
+    }
+
+    .output {
+      margin-top: 25px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #ff0000;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .section {
+      margin-bottom: 16px;
+    }
+
+    .trend-section {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin: 8px 0;
+      font-size: 13px;
+      border-left: 3px solid #ff0000;
+    }
+
+    .footer-button {
+      margin-top: 25px;
+      text-align: center;
+    }
+
+    .brand-btn {
+      background: transparent;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+      display: block;
+      transition: all 0.3s ease;
+    }
+
+    .brand-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .creator-name {
+      text-align: center;
+      font-size: 13px;
+      color: #ccc;
+      margin-top: 12px;
+    }
+
+    /* Optional custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 0, 0, 0.4);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🎥 AI YouTube Content Generator</h1>
+
+  <label for="topic">Enter Your Video Topic or Niche:</label>
+  <input type="text" id="topic" placeholder="e.g., Tech Reviews, Fitness Tips, Cooking Hacks"/>
+
+  <label for="language">Select Language:</label>
+  <select id="language">
+    <option value="English">English</option>
+    <option value="Spanish">Español</option>
+    <option value="French">Français</option>
+    <option value="German">Deutsch</option>
+    <option value="Hindi">हिंदी</option>
+    <option value="Bangla">বাংলা</option>
+  </select>
+
+  <button onclick="generateContent()">Generate Content</button>
+
+  <div class="output" id="output"></div>
+
+  <!-- Footer -->
+  <div class="footer-button">
+    <button class="brand-btn" onclick="window.open('https://hicrazy5.wordpress.com/', '_blank')">
+      Made with Kaustav AI
+    </button>
+    <p class="creator-name">Created by Kaustav Ray</p>
+  </div>
+</div>
+
+<script>
+const googleApiKey = "AIzaSyCrV8RJ-kUj-LCxbqfB1QMa6RsPQ4bM80Y";
+const engineId = "735baae6a3cee4779";
+const geminiApiKey = "AIzaSyAUS24UaK5kfxrfuUCue5zmyX3n3yD7Yek";
+
+// Prompt templates per language
+const PROMPTS = {
+  English: (topic, trends) => `You are a YouTube SEO expert. Based on this topic "${topic}" and current trends like ${trends.join(', ')}, create:
+1. A catchy title (under 60 characters)
+2. A compelling description (with emojis)
+3. Thumbnail idea (vibrant and clickable)
+4. Hashtags (#tag format, 5-8 tags)
+5. A hook for first 10 seconds of video
+
+Format the response as follows:
+Title: [your title]
+Description: [your description]
+Thumbnail: [thumbnail idea]
+Hashtags: [comma-separated hashtags]
+Hook: [hook line]
+
+Don't add any extra text.`,
+
+  Spanish: (topic, trends) => `Eres un experto en SEO de YouTube. Basándote en este tema "${topic}" y tendencias actuales como ${trends.join(', ')}, crea:
+Título: [tu título]
+Descripción: [tu descripción]
+Miniatura: [idea de miniatura]
+Hashtags: [hashtags separados por comas]
+Gancho: [línea de gancho]`,
+
+  French: (topic, trends) => `Vous êtes expert en référencement YouTube. À partir de ce sujet "${topic}" et des tendances actuelles telles que ${trends.join(', ')}, créez :
+Titre : [votre titre]
+Description : [votre description]
+Miniature : [idée de miniature]
+Hashtags : [tags séparés par des virgules]
+Accroche : [ligne d'accroche]`,
+
+  German: (topic, trends) => `Sie sind ein YouTube SEO-Experte. Basierend auf diesem Thema "${topic}" und aktuellen Trends wie ${trends.join(', ')}, erstellen Sie:
+Titel: [Ihr Titel]
+Beschreibung: [Ihre Beschreibung]
+Thumbnail: [Thumbnail-Idee]
+Hashtags: [durch Komma getrennte Hashtags]
+Hook: [Hook-Zeile]`,
+
+  Hindi: (topic, trends) => `आप एक यूट्यूब सीओ (SEO) विशेषज्ञ हैं। इस विषय "${topic}" और वर्तमान प्रवृत्तियों जैसे कि ${trends.join(', ')} के आधार पर:
+शीर्षक: [आपका शीर्षक]
+विवरण: [आपका विवरण]
+थंबनेल: [थंबनेल धारणा]
+हैशटैग: [अल्पविराम से अलग किए गए हैशटैग]
+हुक: [हुक लाइन]`,
+
+  Bangla: (topic, trends) => `আপন একজন ইউটিউব এসইও বিশেষজ্ঞ। এই বিষয় "${topic}" এবং বর্তমান প্রবণতা যেমন ${trends.join(', ')} এর উপর ভিত্তি করে:
+শিরোনাম: [আপনার শিরোনাম]
+বর্ণনা: [আপনার বর্ণনা]
+থাম্বনেইল: [থাম্বনেইল ধারণা]
+হ্যাশট্যাগ: [কমা দ্বারা পৃথক হ্যাশট্যাগ]
+হুক: [হুক লাইন]`
+};
+
+let globalTrends = [];
+
+async function generateContent() {
+  const topic = document.getElementById("topic").value.trim();
+  const language = document.getElementById("language").value;
+  const outputDiv = document.getElementById("output");
+
+  if (!topic) return alert("Please enter a video topic!");
+
+  outputDiv.innerHTML = `<div class="spinner"></div><p style="text-align:center;">🔍 Fetching trends and generating content...</p>`;
+
+  // Step 1: Get trending searches using Google Custom Search API
+  try {
+    const trendQuery = encodeURIComponent(topic + " trending 2025");
+    const googleUrl = `https://www.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${engineId}&q=${trendQuery}`;
+    const res = await fetch(googleUrl);
+    const data = await res.json();
+
+    if (data.items) {
+      globalTrends = data.items.slice(0, 5).map(item => item.title);
+    } else {
+      globalTrends = [];
+    }
+  } catch (err) {
+    console.error("Google Search Error:", err);
+    globalTrends = [];
+  }
+
+  // Step 2: Use Gemini to generate YouTube content
+  let prompt;
+  try {
+    prompt = PROMPTS[language](topic, globalTrends);
+  } catch (e) {
+    prompt = PROMPTS["English"](topic, globalTrends); // Fallback to English
+  }
+
+  const geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + geminiApiKey;
+
+  const geminiBody = {
+    contents: [{
+      parts: [{ text: prompt }]
+    }]
+  };
+
+  try {
+    const geminiRes = await fetch(geminiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(geminiBody)
+    });
+
+    const geminiData = await geminiRes.json();
+    let text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "Error: No valid response from AI.";
+
+    // Format result
+    const lines = text.split('\n');
+    let htmlOutput = '';
+
+    if (globalTrends.length > 0) {
+      htmlOutput += "<strong>🔥 Trending Web Titles:</strong><br>";
+      globalTrends.forEach(title => {
+        htmlOutput += `<div class="trend-section">📌 ${title}</div>`;
+      });
+    }
+
+    lines.forEach(line => {
+      if (line.includes(':')) {
+        const key = line.split(':')[0].trim();
+        const value = line.slice(line.indexOf(':') + 1).trim();
+        const label = getLabel(language, key);
+        htmlOutput += `<div class="section"><strong>${label}:</strong> ${value}</div>`;
+      }
+    });
+
+    if (!htmlOutput) htmlOutput = "<p>No valid content was generated. Please try again.</p>";
+
+    outputDiv.innerHTML = htmlOutput;
+  } catch (err) {
+    console.error("Gemini Error:", err);
+    outputDiv.innerHTML = "❌ Failed to generate content.";
+  }
+}
+
+function getLabel(lang, key) {
+  const labels = {
+    English: {
+      Title: "Title",
+      Description: "Description",
+      Thumbnail: "Thumbnail",
+      Hashtags: "Hashtags",
+      Hook: "Hook"
+    },
+    Spanish: {
+      Title: "Título",
+      Description: "Descripción",
+      Thumbnail: "Miniatura",
+      Hashtags: "Hashtags",
+      Hook: "Gancho"
+    },
+    French: {
+      Title: "Titre",
+      Description: "Description",
+      Thumbnail: "Miniature",
+      Hashtags: "Hashtags",
+      Hook: "Accroche"
+    },
+    German: {
+      Title: "Titel",
+      Description: "Beschreibung",
+      Thumbnail: "Thumbnail",
+      Hashtags: "Hashtags",
+      Hook: "Hook"
+    },
+    Hindi: {
+      Title: "शीर्षक",
+      Description: "विवरण",
+      Thumbnail: "थंबनेल",
+      Hashtags: "हैशटैग",
+      Hook: "हुक"
+    },
+    Bangla: {
+      Title: "শিরোনাম",
+      Description: "বর্ণনা",
+      Thumbnail: "থাম্বনেইল",
+      Hashtags: "হ্যাশট্যাগ",
+      Hook: "হুক"
+    }
+  };
+  return labels[lang][key] || key;
+}
+</script>
+
+</body>
+</html>
